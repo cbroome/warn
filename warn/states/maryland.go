@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -44,6 +45,21 @@ func getHtmlPage(webPage string) (string, error) {
 	return string(body), nil
 }
 
+/**
+ * Trim whitespace on the front of the string and collapse extra spaces in the middle of the
+ * string to one space character.
+ */
+func formatString(text string) string {
+
+	trimmed := strings.TrimSpace(text);
+	m1 := regexp.MustCompile(`\s+`);
+
+	return m1.ReplaceAllString(trimmed, " ");
+}
+
+/**
+ * Walk through the HTML nodes to find any new ones.
+ */
 func parseAndShow(text string) {
 
 	tkn := html.NewTokenizer(strings.NewReader(text))
@@ -52,7 +68,7 @@ func parseAndShow(text string) {
 	var isHTML bool
 	var n int
 
-	var strAray [][]string
+	var strArray [][]string
 	var tempArray []string
 
 	for isHTML != true {
@@ -85,30 +101,25 @@ func parseAndShow(text string) {
 			}
 
 			if isTd && n%8 == 0 {
-				strAray = append(strAray, tempArray)
+				strArray = append(strArray, tempArray)
 				tempArray = nil
 			}
 			isTd = false
 		}
 	}
 
-	// fmt.Print("Output:")
-	// fmt.Printf("%v", strAray)
-
-	for _, v := range strAray {
-
+	for _, v := range strArray {
 		totalEmployees, _ := strconv.Atoi(v[5])
 		test := structs.WarnNotice{
-			NoticeDate: strings.TrimSpace(v[0]),
-			NaicsCode: strings.TrimSpace(v[1]),
-			Company: strings.TrimSpace(v[2]),
-			Location: strings.TrimSpace(v[3]),
-			LocalArea: strings.TrimSpace(v[4]),
+			NoticeDate: formatString(v[0]),
+			NaicsCode: formatString(v[1]),
+			Company: formatString(v[2]),
+			Location: formatString(v[3]),
+			LocalArea: formatString(v[4]),
 			TotalEmployees: totalEmployees,
-			EffectiveDate: strings.TrimSpace(v[6]),
-			LayoffType: strings.TrimSpace(v[7]),
+			EffectiveDate: formatString(v[6]),
+			LayoffType: formatString(v[7]),
 		}
-
 		fmt.Printf("%v\n", test.Company)
 	}
 }
@@ -122,5 +133,3 @@ func MarylandHandler() (string, error) {
 	parseAndShow(data)
 	return "", nil
 }
-
-
