@@ -1,6 +1,5 @@
 package structs
 
-
 type WarnNotice struct {
 	NoticeDate string
 	NaicsCode string
@@ -11,3 +10,5 @@ type WarnNotice struct {
 	EffectiveDate string
 	LayoffType string
 }
+
+
